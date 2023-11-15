@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer Game!</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+
+body {
+  text-align: center;
+  background-image: url(https://img.itch.zone/aW1hZ2UvNTUxNTQyLzI4ODUyNzcuanBn/original/dlygB5.jpg);
+  background-size: cover;
+  b
+}
+#myCanvas {
+  background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/db/493px-Soccer_field_-_empty.png);
+  margin-top: 30px;
+  border: 5px solid black;
+  background-size: cover;
+  background-position: center center;
+/*   display: inline-block; */
+}
+
+#p1-info {
+  float: left;
+  width: 200px;
+  color: white;
+  background-color: darkgreen;
+  margin-left: 100px;
+  margin-top: 30px;
+  border-radius: 25px;
+  padding: 15px;
+  font-family: Ubuntu;
+  line-height: 2em;
+  
+}
+#p2-info {
+  float: right;
+  width: 200px;
+  color: white;
+  background-color: darkgreen;
+  margin-right: 100px;
+  margin-top: 30px;
+  border-radius: 25px;
+  padding: 15px;
+  font-family: Ubuntu;
+  line-height: 2em;
+}
+</style>
+</head>
+<body>
+    <div id="main">
+  <div id="p1-info">
+<p>Player 1 (Top Player):
+  <br>
+    Up: W
+  <br>
+  Down: S
+  <br>
+  Left: A
+  <br>
+  Right: D
+  </p>
+    </div>
+  <div id="p2-info">
+    <p>Player 2 (Bottom Player):
+  <br>
+    Up: ↑
+  <br>
+  Down: ↓
+  <br>
+  Left: ←
+  <br>
+  Right: →
+  </p>
+<!--     <select id="p1-select">
+  <option value="" disabled selected>Choose Your Player</option>
+      <option value="mario">Mario</option>
+      <option value="Luigi">Luigi</option>
+      <option value="Yoshi">Yoshi</option>
+      <option value="Wario">Wario</option>
+      <option value="Waluigi">Waluigi</option>
+      <option value="messi">Messi</option>
+      <option value="Ronaldo">Ronaldo</option>
+    </select> -->
+    </div>
+  <canvas id="myCanvas" width="400" height="540">Your browser does not have javascript enabled</canvas>
+<br>
+  <button type="button" onclick="playGame()">Play Game</button>
+</div>
+    <script>
+const canvas = document.getElementById('myCanvas');
+let ctx = canvas.getContext('2d');
+
+// const player1Select = document.getElementById("p1-select");
+
+// const luigiSrc = "https://drive.google.com/uc?export=view&id=1S6_IuFzORGXJ3SYKBKsvSxfrXYBhDAtT";
+
+// const marioSrc = "https://drive.google.com/uc?export=view&id=1AX-18Gt20b-OooMCvDFpunMuqBscZioY";
+
+// const yoshiSrc = "https://drive.google.com/uc?export=view&id=1c-zbk0eRjckHFRlo10RbEVNACbbq7WGB";
+
+// const warioSrc = "https://drive.google.com/uc?export=view&id=1KHJ3IXVJtZhvkLpI5Ax9ej4lVbSfDnUn";
+
+// const waluigiSrc = "https://drive.google.com/uc?export=view&id=17-aeRIw_9hLWspK7jeBUoV7_-X4pODRD";
+
+// const messiSrc = "https://b.fssta.com/uploads/application/soccer/headshots/885.png";
+
+// const ronaldoSrc = "https://b.fssta.com/uploads/application/soccer/headshots/711.vresize.350.350.medium.70.png";
+
+// player1Select.addEventListener("change", function () {
+//   let userChoice = this.value;
+//   switch (userChoice) {
+//     case "mario":
+//       player2Image.src = marioSrc;
+//   }
+// });
+
+
+const PI = Math.PI
+let CW = canvas.width;
+let CH = canvas.height;
+let ballW = 30;
+let ballH = 30;
+let ballX = CW / 2 - ballW / 2;
+let ballY = CH / 2 - ballH / 2;
+let fillColor = "black";
+let ballSpeedX = 5;
+let ballSpeedY = 5;
+let moveRight = false;
+let moveLeft = false;
+let moveUp = false;
+let moveDown = false;
+let falls = 0;
+let goals = 0;
+let playerOneGoal = 0;
+let playerTwoGoal = 0;
+let moveRightP2 = false;
+let moveLeftP2 = false;
+let moveUpP2 = false;
+let moveDownP2 = false;
+
+let ballIconSrc = "https://cdn-icons-png.flaticon.com/512/53/53283.png";
+let ballImage = new Image();
+ballImage.crossOrigin = "anonymous";
+ballImage.src = ballIconSrc;
+
+let playerIconSrc = "https://b.fssta.com/uploads/application/soccer/headshots/885.png";
+let playerImage = new Image();
+playerImage.crossOrigin = "anonymous";
+playerImage.src = playerIconSrc;
+
+let player2IconSrc = "https://b.fssta.com/uploads/application/soccer/headshots/711.vresize.350.350.medium.70.png";
+let player2Image = new Image();
+player2Image.crossOrigin = "anonymous";
+player2Image.src = player2IconSrc;
+
+// https://mario.wiki.gallery/images/thumb/e/e2/Mario_Smash_Football_Main_Menu_Mario.png/120px-Mario_Smash_Football_Main_Menu_Mario.png
+
+// https://static.vecteezy.com/system/resources/previews/027/517/658/original/pixel-art-white-uniform-soccer-player-png.png 
+
+let netIconSrc = "https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/27049/goal-with-gras-clipart-xl.png";
+let netImage = new Image();
+netImage.crossOrigin = "anonymous";
+netImage.src = netIconSrc;
+
+// ball pic
+// https://cdn-icons-png.flaticon.com/512/53/53283.png
+
+// shy guy tennis player
+// https://mario.wiki.gallery/images/thumb/2/21/Shy_Guy_MPT64_artwork.png/300px-Shy_Guy_MPT64_artwork.png
+
+function drawRect(x, y, w, h) {
+  ctx.fillRect(x, y, w, h);
+}
+
+function drawBall(ballX, ballY, ballW, ballH, fillColor) {
+// ctx.beginPath();
+// ctx.fillRect(ballX, ballY, ballW, ballH, fillColor);
+// ctx.fillStyle = fillColor;
+// ctx.fill();
+// ctx.closePath();
+   ctx.drawImage(ballImage, ballX, ballY, ballW, ballH);
+}
+
+let paddleW = 80;
+let paddleH = 70;
+let paddleX = CW / 2 - paddleW / 2;
+let paddleY = CH / 2 + 180;
+let paddleColor = "black";
+let bounces = 0;
+
+
+function drawPaddle(paddleX, paddleY, paddleW, paddleH, paddleColor) {
+  // ctx.fillRect(paddleX, paddleY, paddleW, paddleH, paddleColor);
+  // ctx.fillStyle = "black";
+  ctx.drawImage(playerImage, paddleX, paddleY, paddleW, paddleH);
+}
+
+let paddleW2 = 80;
+let paddleH2 = 70;
+let paddleX2 = CW / 2 - paddleW2 / 2;
+let paddleY2 = CH / 2 - 235;
+
+function drawPaddleTwo() {
+  // ctx.fillRect(paddleX, paddleY, paddleW, paddleH, paddleColor);
+  // ctx.fillStyle = "black";
+  ctx.drawImage(player2Image, paddleX2, paddleY2, paddleW2, paddleH2);
+}
+
+drawPaddle(paddleX, paddleY, paddleW, paddleH, paddleColor);
+
+drawBall(ballX, ballY, ballW, ballH, fillColor);
+
+let netW = 220;
+let netH = 30;
+let netX = CW / 2 - netW / 2;
+let netY = CH / 2 - 270;
+
+function drawNet() {
+  // drawRect(netX, netY, netW, netH);
+  ctx.drawImage(netImage, netX, netY, netW, netH);
+}
+drawNet();
+
+let netW2 = 220;
+let netH2 = 30;
+let netX2 = CW / 2 - netW / 2;
+let netY2 = CH / 2 + 245;
+function drawNet2() {
+  // drawRect(netX, netY, netW, netH);
+  ctx.drawImage(netImage, netX2, netY2, netW2, netH2);
+}
+drawNet2();
+
+function drawHUD() {
+  ctx.font = "12px Arial";
+  ctx.fillText("Player 1: " + playerOneGoal, 15, 20);
+  ctx.fillText("Player 2: " + playerTwoGoal, 15, 532);
+}
+drawHUD();
+
+function paddleCollision() {
+  if (ballX < paddleX + paddleW && ballX + ballW > paddleX && ballY < paddleY + paddleH && ballY + ballH > paddleY) {
+    return true;
+  }
+}
+function paddleTwoCollision() {
+  if (ballX < paddleX2 + paddleW2 && ballX + ballW > paddleX2 && ballY < paddleY2 + paddleH2 && ballY + ballH > paddleY2) {
+    return true;
+  }
+}
+
+function netCollision() {
+  if (ballX < netX2 + netW2 && ballX + ballW > netX2 && ballY < netY2 + ballH && ballY + ballH > netY2) {
+    return true;
+  }
+}
+function netTwoCollision() {
+  if (ballX < netX + netW && ballX + ballW > netX && ballY < netY + ballH && ballY + ballH > netY) {
+    return true;
+  }
+}
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "ArrowRight") {
+    // paddleX += 10;
+    moveRight = true;
+  }
+  if (event.key === "ArrowLeft") {
+    // paddleX -= 10;
+    moveLeft = true;
+  }
+  if (event.key === "ArrowUp") {
+    moveUp = true;
+  }
+  if (event.key === "ArrowDown") {
+    moveDown = true;
+  }
+    if (event.key === "d") {
+    // paddleX += 10;
+    moveRightP2 = true;
+  }
+  if (event.key === "a") {
+    // paddleX -= 10;
+    moveLeftP2 = true;
+  }
+  if (event.key === "w") {
+    moveUpP2 = true;
+  }
+  if (event.key === "s") {
+    moveDownP2 = true;
+  }
+});
+document.addEventListener("keyup", function(event) {
+  if (event.key === "ArrowRight") {
+    // paddleX += 10;
+    moveRight = false;
+  }
+  if (event.key === "ArrowLeft") {
+    // paddleX -= 10;
+    moveLeft = false;
+  }
+  if (event.key === "ArrowUp") {
+    moveUp = false;
+  }
+  if (event.key === "ArrowDown") {
+    moveDown = false;
+  }
+    if (event.key === "d") {
+    // paddleX += 10;
+    moveRightP2 = false;
+  }
+  if (event.key === "a") {
+    // paddleX -= 10;
+    moveLeftP2 = false;
+  }
+  if (event.key === "w") {
+    moveUpP2 = false;
+  }
+  if (event.key === "s") {
+    moveDownP2 = false;
+  }
+});
+
+function playGame() {
+  ctx.clearRect(0, 0, CW, CH);
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+  if (ballX + ballW > CW || ballX < 0) {
+    ballSpeedX = ballSpeedX * -1;
+  }
+  if (ballY + ballH > CH - 20 || ballY < 20) {
+    ballSpeedY = ballSpeedY * -1;
+  }
+  //   if (ballY + ballH > CH) {
+  //   ballSpeedY = ballSpeedY * -1;
+  // }
+  
+  if (paddleCollision()) {
+    console.log("collision!")
+    bounces++;
+    console.log(bounces);
+    ballSpeedX = (Math.floor(Math.random()*3) + 4);
+    ballSpeedY= (Math.floor(Math.random()*3) + 4);
+    ballSpeedY *= -1;
+    let ranNum = (Math.floor(Math.random()*2));
+    if (ranNum == 0) {
+      ballSpeedX *= 1;
+    } else {
+      ballSpeedX *= -1;
+    }
+  }
+  
+   if (paddleTwoCollision()) {
+    console.log("collision!")
+    bounces++;
+    console.log(bounces);
+    ballSpeedX = (Math.floor(Math.random()*3) + 3);
+    ballSpeedY= (Math.floor(Math.random()*3) + 3);
+    ballSpeedY *= 1;
+    let ranNum = (Math.floor(Math.random()*2));
+    if (ranNum == 0) {
+      ballSpeedX *= 1;
+    } else {
+      ballSpeedX *= -1;
+    }
+  }
+  
+ if (netCollision()) {
+    console.log("goal!");
+    playerOneGoal++;
+    console.log(goals);
+    ballSpeedX *= -1;
+    ballSpeedY *= -1;
+    ballX = CW / 2 - ballW / 2;
+    ballY = CH / 2 - ballH / 2 + 130;
+    ballSpeedX = 0;
+    ballSpeedY = 0;
+    paddleX = CW / 2 - paddleW / 2;
+    paddleY = CH / 2 + 180;
+    paddleX2 = CW / 2 - paddleW / 2;
+    paddleY2 = CH / 2 - 235;
+   
+  }
+   if (netTwoCollision()) {
+    console.log("goal!");
+    playerTwoGoal++;
+    console.log(goals);
+    ballSpeedX *= -1;
+    ballSpeedY *= -1;
+     ballX = CW / 2 - ballW / 2;
+   ballY = CH / 2 - ballH / 2 - 130;
+     ballSpeedX = 0;
+     ballSpeedY = 0;
+     paddleX = CW / 2 - paddleW / 2;
+     paddleY = CH / 2 + 180;
+     paddleX2 = CW / 2 - paddleW / 2;
+     paddleY2 = CH / 2 - 235;
+  }
+  if (moveRight && paddleX + paddleW < CW) {
+    paddleX += 8;
+  }
+  if (moveLeft && paddleX > 0) {
+    paddleX -= 8;
+  }
+  if (moveUp && paddleY > 0) {
+    paddleY -= 6;
+  }
+  if (moveDown && paddleY + paddleH < CH) {
+    paddleY += 6;
+  }
+  
+    if (moveRightP2 && paddleX2 + paddleW2 < CW) {
+    paddleX2 += 8;
+  }
+  if (moveLeftP2 && paddleX2 > 0) {
+    paddleX2 -= 8;
+  }
+  if (moveUpP2 && paddleY2 > 0) {
+    paddleY2 -= 6;
+  }
+  if (moveDownP2 && paddleY2 + paddleH2 < CH) {
+    paddleY2 += 6;
+  }
+  
+  drawBall(ballX, ballY, ballW, ballH, fillColor);
+  drawPaddle(paddleX, paddleY, paddleW, paddleH);
+  drawNet();
+  drawHUD();
+  drawNet2();
+  drawPaddleTwo();
+  
+  requestAnimationFrame(playGame);
+  
+}
+drawBall();
+drawPaddle();
+drawNet();
+drawHUD();
+drawNet2();
+drawPaddleTwo();
+    </script>
+</body>
+</html>
